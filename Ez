@@ -1,0 +1,52 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    private Rigidbody2D rb;
+    
+    [Header("Configurações de Movimento")]
+    public float velocidade = 5f;
+    public float forcaPulo = 7f;
+    
+    [Header("Verificação de Chão")]
+    public Transform verificadorChao;
+    public LayerMask oQueEChao;
+    public float raioVerificacao = 0.2f;
+    private bool estaNoChao;
+
+    void Start()
+    {
+        // Obtém o componente Rigidbody2D acoplado ao objeto
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    void Update()
+    {
+        // Verifica se o personagem está tocando no chão
+        estaNoChao = Physics2D.OverlapCircle(verificadorChao.position, raioVerificacao, oQueEChao);
+
+        // Movimento horizontal automático ou por teclas (opcional)
+        float movimentoX = Input.GetAxis("Horizontal") * velocidade;
+        rb.linearVelocity = new Vector2(movimentoX, rb.linearVelocity.y);
+    }
+
+    // Esta função deve ser chamada pelo Botão da UI (Canvas)
+    public void Pular()
+    {
+        // Só pula se estiver no chão
+        if (estaNoChao)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, forcaPulo);
+        }
+    }
+
+    // Visualizar o raio do chão na aba Scene da Unity
+    private void OnDrawGizmosSelected()
+    {
+        if (verificadorChao != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(verificadorChao.position, raioVerificacao);
+        }
+    }
+}
